@@ -304,8 +304,32 @@ body{
   border-bottom:1px solid rgba(255,255,255,0.02);
 }
 
+/* Container untuk gambar karakter */
+.character-image {
+  width: 100%;             /* mengikuti lebar parent */
+  max-width: 200px;        /* kamu bebas atur: 150 / 200 / 250 */
+  aspect-ratio: 1 / 1;     /* thumbnail kotak, tetap proporsional */
+  margin: 0 auto;
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;        /* biar tidak melewati frame */
+  justify-content: center;
+  align-items: center;
+  background: #1b1b1b;     /* warna background kalau gambar kecil */
+}
+
+/* Gambar karakter */
+.character-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;     /* biar gambar tidak terdistorsi */
+  image-rendering: crisp-edges; 
+  image-rendering: pixelated; /* opsional kalau mau gaya pixel */
+}
+
 /* RESPONSIVE */
 @media (max-width:1000px){
   .sidebar{ display:none }
 }
+
 
