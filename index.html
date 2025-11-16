@@ -106,5 +106,25 @@
   </div>
 
   <script src="script.js"></script>
+
+  <!-- MODAL CLOSE HANDLER -->
+  <script>
+    const modal = document.getElementById("modal");
+    const modalContent = document.querySelector(".modal-content");
+    const modalCloseBtn = document.getElementById("modal-close");
+
+    // click outside = close
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.classList.add("hidden");
+      }
+    });
+
+    // click X button = close
+    modalCloseBtn.addEventListener("click", () => {
+      modal.classList.add("hidden");
+    });
+  </script>
+
 </body>
 </html>
