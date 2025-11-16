@@ -184,6 +184,42 @@ body{
   position:relative; /* FIXED untuk tombol X */
 }
 
+/* --- Modal Layout Stabilizer --- */
+
+/* Paksa tinggi minimum modal agar tidak collapse saat data masih kosong */
+.modal-content {
+  min-height: 220px;        /* cukup besar untuk header + 3 baris info */
+  position: relative;       /* pastikan tombol X selalu refer ke modal-content */
+  padding-top: 20px;        /* memberi ruang untuk header */
+}
+
+/* Tinggi minimum header supaya tombol tidak bertumpuk */
+.modal-header {
+  min-height: 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 40px;      /* ruang ekstra supaya bookmark dan X tidak tabrakan */
+}
+
+/* Tombol X di pojok kanan atas seperti UI modern */
+.close {
+  position: absolute;
+  top: 10px;                 /* lebih rapat, lebih rapi */
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 20;               /* pastikan selalu di atas elemen lain */
+}
+
+/* Supaya body tidak naik terlalu dekat ke header */
+.modal-body {
+  margin-top: 16px;
+}
+
 /* FIXED close button */
 .close{
   position:absolute;
@@ -272,3 +308,4 @@ body{
 @media (max-width:1000px){
   .sidebar{ display:none }
 }
+
