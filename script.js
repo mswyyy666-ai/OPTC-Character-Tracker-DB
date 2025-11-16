@@ -1,3 +1,31 @@
+// Load character data from GitHub
+async function loadCharacters() {
+  const url = "https://raw.githubusercontent.com/mswyyy666-ai/OPTC-Character-Tracker-DB/main/data/characters.json";
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Failed to fetch character database");
+
+    const data = await response.json();
+
+    // Pastikan semua unit memiliki .id untuk dimasukkan ke ownedSet
+    return Object.values(data).map((unit, index) => ({
+      id: unit.id ?? index,       // fallback ID jika JSON tidak punya id
+      name: unit.name,
+      type: unit.type,
+      class: unit.class,
+      stars: unit.stars,
+      thumbnail: unit.thumbnail
+        ?? unit.portrait
+        ?? "placeholder.png"      // fallback biar tidak error saat gambar hilang
+    }));
+
+  } catch (e) {
+    console.error("Error loading characters:", e);
+    return [];
+  }
+}
+
 // script.js (re-generated)
 
 
@@ -72,4 +100,5 @@ const ownedSet = loadOwnedLocal();
 
 const list = Object.values(characters);
 renderCharacters(list, ownedSet);
+
 });
