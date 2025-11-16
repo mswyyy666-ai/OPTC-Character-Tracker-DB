@@ -8,16 +8,13 @@ async function loadCharacters() {
 
     const data = await response.json();
 
-    // Pastikan semua unit memiliki .id untuk dimasukkan ke ownedSet
     return Object.values(data).map((unit, index) => ({
-      id: unit.id ?? index,       // fallback ID jika JSON tidak punya id
+      id: unit.id ?? index,
       name: unit.name,
       type: unit.type,
       class: unit.class,
       stars: unit.stars,
-      thumbnail: unit.thumbnail
-        ?? unit.portrait
-        ?? "placeholder.png"      // fallback biar tidak error saat gambar hilang
+      thumbnail: unit.thumbnail ?? unit.portrait ?? "placeholder.png"
     }));
 
   } catch (e) {
@@ -26,79 +23,69 @@ async function loadCharacters() {
   }
 }
 
-// script.js (re-generated)
-
-
 // Render characters to the grid
 function renderCharacters(list, ownedSet) {
-const grid = document.getElementById('character-grid');
-grid.innerHTML = '';
+  const grid = document.getElementById('grid'); // FIXED
+  grid.innerHTML = '';
 
+  list.forEach(unit => {
+    const box = document.createElement('div');
+    box.className = 'char-box';
+    if (ownedSet.has(unit.id)) box.classList.add('owned');
 
-list.forEach(unit => {
-const box = document.createElement('div');
-box.className = 'char-box';
-if (ownedSet.has(unit.id)) box.classList.add('owned');
+    box.innerHTML = `
+      <img src="${unit.thumbnail}" alt="${unit.name}" />
+    `;
 
-
-box.innerHTML = `
-<img src="${unit.thumbnail}" alt="${unit.name}" />
-`;
-
-
-box.addEventListener('click', () => openCharacterModal(unit, ownedSet));
-grid.appendChild(box);
-});
+    box.addEventListener('click', () => openCharacterModal(unit, ownedSet));
+    grid.appendChild(box);
+  });
 }
 
-
-// Character modal
+// Open modal
 function openCharacterModal(unit, ownedSet) {
-const modal = document.getElementById('character-modal');
-const title = document.getElementById('modal-title');
-const body = document.getElementById('modal-body');
-const checkbox = document.getElementById('modal-owned');
+  const modal = document.getElementById('modal'); // FIXED
+  const title = document.getElementById('modal-name'); // FIXED
+  const body = document.getElementById('modal-body');
+  const checkbox = document.getElementById('modal-owned');
 
+  title.textContent = unit.name;
+  body.innerHTML = `
+    <p>Type: ${unit.type}</p>
+    <p>Class: ${unit.class}</p>
+    <p>Rarity: ${unit.stars}</p>
+  `;
 
-title.textContent = unit.name;
-body.innerHTML = `
-<p>Type: ${unit.type}</p>
-<p>Class: ${unit.class}</p>
-<p>Rarity: ${unit.stars}</p>
-`;
+  checkbox.checked = ownedSet.has(unit.id);
+  checkbox.onchange = () => {
+    if (checkbox.checked) ownedSet.add(unit.id);
+    else ownedSet.delete(unit.id);
+    saveOwnedLocal(ownedSet);
+  };
 
-
-checkbox.checked = ownedSet.has(unit.id);
-checkbox.onchange = () => {
-if (checkbox.checked) ownedSet.add(unit.id);
-else ownedSet.delete(unit.id);
-saveOwnedLocal(ownedSet);
-};
-
-
-modal.style.display = 'flex';
+  modal.classList.remove("hidden"); // FIXED untuk buka modal
 }
 
-
-// LocalStorage save/load
+// Save locally
 function saveOwnedLocal(ownedSet) {
-localStorage.setItem('ownedCharacters', JSON.stringify([...ownedSet]));
+  localStorage.setItem('ownedCharacters', JSON.stringify([...ownedSet]));
 }
 
-
+// Load locally
 function loadOwnedLocal() {
-const saved = localStorage.getItem('ownedCharacters');
-return saved ? new Set(JSON.parse(saved)) : new Set();
+  const saved = localStorage.getItem('ownedCharacters');
+  return saved ? new Set(JSON.parse(saved)) : new Set();
 }
 
-
-// Page initialization
+// Init
 window.addEventListener('DOMContentLoaded', async () => {
-const characters = await loadCharacters();
-const ownedSet = loadOwnedLocal();
+  const characters = await loadCharacters();
+  const ownedSet = loadOwnedLocal();
 
+  renderCharacters(characters, ownedSet);
 
-const list = Object.values(characters);
-renderCharacters(list, ownedSet);
-
+  // close modal button
+  document.getElementById("modal-close").onclick = () => {
+    document.getElementById("modal").classList.add("hidden");
+  };
 });
