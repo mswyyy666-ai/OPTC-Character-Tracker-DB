@@ -63,6 +63,16 @@ function openCharacterModal(unit, ownedSet) {
     saveOwnedLocal(ownedSet);
   };
 
+    modal.addEventListener("click", (e) => {
+    if (!modalContent.contains(e.target)) {
+      modal.classList.add("hidden");
+    }
+  });
+
+    modalCloseBtn.addEventListener("click", () => {
+    modal.classList.add("hidden");
+  });
+
   modal.classList.remove("hidden"); // FIXED untuk buka modal
 }
 
@@ -89,3 +99,4 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById("modal").classList.add("hidden");
   };
 });
+
