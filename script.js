@@ -25,7 +25,7 @@ async function loadCharacters() {
 
 // Render characters to the grid
 function renderCharacters(list, ownedSet) {
-  const grid = document.getElementById('grid'); // FIXED
+  const grid = document.getElementById('grid');
   grid.innerHTML = '';
 
   list.forEach(unit => {
@@ -33,9 +33,7 @@ function renderCharacters(list, ownedSet) {
     box.className = 'char-box';
     if (ownedSet.has(unit.id)) box.classList.add('owned');
 
-    box.innerHTML = `
-      <img src="${unit.thumbnail}" alt="${unit.name}" />
-    `;
+    box.innerHTML = `<img src="${unit.thumbnail}" alt="${unit.name}" />`;
 
     box.addEventListener('click', () => openCharacterModal(unit, ownedSet));
     grid.appendChild(box);
@@ -44,8 +42,10 @@ function renderCharacters(list, ownedSet) {
 
 // Open modal
 function openCharacterModal(unit, ownedSet) {
-  const modal = document.getElementById('modal'); // FIXED
-  const title = document.getElementById('modal-name'); // FIXED
+  const modal = document.getElementById('modal');
+  const modalContent = document.querySelector('.modal-content');
+  const modalCloseBtn = document.getElementById('modal-close');
+  const title = document.getElementById('modal-name');
   const body = document.getElementById('modal-body');
   const checkbox = document.getElementById('modal-owned');
 
@@ -63,17 +63,16 @@ function openCharacterModal(unit, ownedSet) {
     saveOwnedLocal(ownedSet);
   };
 
-    modal.addEventListener("click", (e) => {
+  // Close modal (global handler, not duplicated)
+  modalCloseBtn.onclick = () => modal.classList.add("hidden");
+
+  modal.onclick = (e) => {
     if (!modalContent.contains(e.target)) {
       modal.classList.add("hidden");
     }
-  });
+  };
 
-    modalCloseBtn.addEventListener("click", () => {
-    modal.classList.add("hidden");
-  });
-
-  modal.classList.remove("hidden"); // FIXED untuk buka modal
+  modal.classList.remove("hidden");
 }
 
 // Save locally
@@ -94,9 +93,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   renderCharacters(characters, ownedSet);
 
-  // close modal button
+  // Extra safety: close button fallback
   document.getElementById("modal-close").onclick = () => {
     document.getElementById("modal").classList.add("hidden");
   };
 });
-
