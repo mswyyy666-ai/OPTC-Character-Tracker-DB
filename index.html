@@ -88,22 +88,27 @@
     </main>
   </div>
 
-  <!-- Modal -->
-  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-content">
-      <button id="modal-close" class="close" aria-label="close">✕</button>
-      <header class="modal-header">
-        <h2 id="modal-name">Character Name</h2>
-        <div>
-          <label class="owned-toggle">
-            <input type="checkbox" id="modal-owned" /> I own this
-          </label>
-          <button id="modal-bookmark" class="small-btn">★ Bookmark</button>
-        </div>
-      </header>
-      <div id="modal-body" class="modal-body"></div>
-    </div>
+<!-- Modal -->
+<div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-content">
+    <header class="modal-header">
+      <h2 id="modal-name">Character Name</h2>
+
+      <div class="modal-tools">
+        <label class="owned-toggle">
+          <input type="checkbox" id="modal-owned" /> I own this
+        </label>
+
+        <button id="modal-bookmark" class="small-btn">★ Bookmark</button>
+
+        <!-- X HERE -->
+        <button id="modal-close" class="close small-btn">✕</button>
+      </div>
+    </header>
+
+    <div id="modal-body" class="modal-body"></div>
   </div>
+</div>
 
   <script src="script.js"></script>
 
@@ -128,3 +133,4 @@
 
 </body>
 </html>
+
