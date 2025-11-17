@@ -1,4 +1,6 @@
+// ==============================
 // Load only character ID 1
+// ==============================
 async function loadCharacter1() {
   const url = "https://raw.githubusercontent.com/mswyyy666-ai/OPTC-Character-Tracker-DB/main/data/characters.json";
 
@@ -15,7 +17,8 @@ async function loadCharacter1() {
     const folder1 = idStr[0]; // "0"
     const folder2Num = Math.floor(parseInt(idStr, 10) / 100) * 100; // 0
     const folder2 = String(folder2Num).padStart(3, "0"); // "000"
-    const thumbnail = `/api/images/thumbnail/glo/${folder1}/${folder2}/${idStr}.png`;
+
+    const thumbnail = `api/images/thumbnail/glo/${folder1}/${folder2}/${idStr}.png`;
 
     return [{
       id: 1,
@@ -31,7 +34,9 @@ async function loadCharacter1() {
   }
 }
 
-// Render characters to the grid (same as before)
+// ==============================
+// Render characters
+// ==============================
 function renderCharacters(list, ownedSet) {
   if (!Array.isArray(list)) list = [];
 
@@ -47,8 +52,8 @@ function renderCharacters(list, ownedSet) {
     img.src = unit.thumbnail;
     img.alt = unit.name;
 
-    // fallback jika error
-    img.onerror = () => img.src = '/api/images/common/icons/noimage.png';
+    // fallback jika thumbnail gagal
+    img.onerror = () => img.src = "api/images/common/icons/noimage.png";
 
     box.appendChild(img);
     box.addEventListener('click', () => openCharacterModal(unit, ownedSet));
@@ -56,17 +61,9 @@ function renderCharacters(list, ownedSet) {
   });
 }
 
-// Owned characters
-function saveOwnedLocal(ownedSet) {
-  localStorage.setItem('ownedCharacters', JSON.stringify([...ownedSet]));
-}
-
-function loadOwnedLocal() {
-  const saved = localStorage.getItem('ownedCharacters');
-  return saved ? new Set(JSON.parse(saved)) : new Set();
-}
-
-// Modal sama seperti versi sebelumnya
+// ==============================
+// Modal
+// ==============================
 function openCharacterModal(unit, ownedSet) {
   const modal = document.getElementById('modal');
   const modalContent = document.getElementById("modal-content");
@@ -98,7 +95,21 @@ function openCharacterModal(unit, ownedSet) {
   modal.classList.remove("hidden");
 }
 
+// ==============================
+// localStorage functions
+// ==============================
+function saveOwnedLocal(ownedSet) {
+  localStorage.setItem('ownedCharacters', JSON.stringify([...ownedSet]));
+}
+
+function loadOwnedLocal() {
+  const saved = localStorage.getItem('ownedCharacters');
+  return saved ? new Set(JSON.parse(saved)) : new Set();
+}
+
+// ==============================
 // Init
+// ==============================
 window.addEventListener('DOMContentLoaded', async () => {
   const characters = await loadCharacter1();
   const ownedSet = loadOwnedLocal();
