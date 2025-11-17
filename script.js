@@ -1,15 +1,3 @@
-// Build thumbnail URL from ID
-function getThumbnailUrl(id) {
-  const A = String(id)[0]; // first digit
-
-  const B = (Math.floor(id / 100) * 100) % 1000; 
-  const Bfolder = B.toString().padStart(3, "0");
-
-  const ID = id.toString().padStart(4, "0");
-
-  return `https://2shankz.github.io/optc-db.github.io/api/images/thumbnail/jap/${A}/${Bfolder}/${ID}.png`;
-}
-
 // Load character data from GitHub
 async function loadCharacters() {
   const url = "https://raw.githubusercontent.com/mswyyy666-ai/OPTC-Character-Tracker-DB/main/data/characters.json";
@@ -26,7 +14,7 @@ async function loadCharacters() {
       type: unit.type,
       class: unit.class,
       stars: unit.stars,
-      thumbnail: getThumbnailUrl(unit.id)
+      thumbnail: `api/images/thumbnail/jap/${String(unit.id).padStart(4, "0")[0]}/${String(unit.id).padStart(4, "0")[1]}00/${String(unit.id).padStart(4, "0")}.png`
     }));
 
   } catch (e) {
@@ -45,9 +33,7 @@ function renderCharacters(list, ownedSet) {
     box.className = 'char-box';
     if (ownedSet.has(unit.id)) box.classList.add('owned');
 
-    box.innerHTML = `
-      <img src="${unit.thumbnail}" alt="${unit.name}" />
-    `;
+    box.innerHTML = `<img src="${unit.thumbnail}" alt="${unit.name}" />`;
 
     box.addEventListener('click', () => openCharacterModal(unit, ownedSet));
     grid.appendChild(box);
@@ -57,11 +43,11 @@ function renderCharacters(list, ownedSet) {
 // Open modal
 function openCharacterModal(unit, ownedSet) {
   const modal = document.getElementById('modal');
-  const modalContent = document.getElementById("modal-content");
+  const modalContent = document.querySelector('.modal-content');
+  const modalCloseBtn = document.getElementById('modal-close');
   const title = document.getElementById('modal-name');
   const body = document.getElementById('modal-body');
   const checkbox = document.getElementById('modal-owned');
-  const modalCloseBtn = document.getElementById("modal-close");
 
   title.textContent = unit.name;
   body.innerHTML = `
@@ -77,16 +63,13 @@ function openCharacterModal(unit, ownedSet) {
     saveOwnedLocal(ownedSet);
   };
 
-  // Click outside to close
+  // Close modal (global handler, not duplicated)
+  modalCloseBtn.onclick = () => modal.classList.add("hidden");
+
   modal.onclick = (e) => {
     if (!modalContent.contains(e.target)) {
       modal.classList.add("hidden");
     }
-  };
-
-  // Close button
-  modalCloseBtn.onclick = () => {
-    modal.classList.add("hidden");
   };
 
   modal.classList.remove("hidden");
@@ -109,4 +92,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   const ownedSet = loadOwnedLocal();
 
   renderCharacters(characters, ownedSet);
+
+  // Extra safety: close button fallback
+  document.getElementById("modal-close").onclick = () => {
+    document.getElementById("modal").classList.add("hidden");
+  };
 });
