@@ -1,15 +1,3 @@
-// Build thumbnail URL from ID
-function getThumbnailUrl(id) {
-  const A = String(id)[0]; // first digit
-
-  const B = (Math.floor(id / 100) * 100) % 1000; 
-  const Bfolder = B.toString().padStart(3, "0");
-
-  const ID = id.toString().padStart(4, "0");
-
-  return `https://raw.githubusercontent.com/mswyyy666-ai/OPTC-Character-Tracker-DB/api/images/thumbnail/jap/${A}/${Bfolder}/${ID}.png`;
-}
-
 // Load character data from GitHub
 async function loadCharacters() {
   const url = "https://raw.githubusercontent.com/mswyyy666-ai/OPTC-Character-Tracker-DB/main/data/characters.json";
@@ -26,7 +14,7 @@ async function loadCharacters() {
       type: unit.type,
       class: unit.class,
       stars: unit.stars,
-      thumbnail: getThumbnailUrl(unit.id)
+      thumbnail: `api/images/thumbnail/jap/${String(unit.id).padStart(4, "0")[0]}/${String(unit.id).padStart(4, "0")[1]}00/${String(unit.id).padStart(4, "0")}.png`
     }));
 
   } catch (e) {
@@ -110,3 +98,4 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   renderCharacters(characters, ownedSet);
 });
+
