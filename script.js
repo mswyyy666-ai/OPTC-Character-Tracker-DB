@@ -1,3 +1,4 @@
+// Load character data from GitHub
 async function loadCharacters() {
   const url = "https://raw.githubusercontent.com/mswyyy666-ai/OPTC-Character-Tracker-DB/main/data/characters.json";
 
@@ -9,14 +10,25 @@ async function loadCharacters() {
 
     return Object.entries(data)
       .filter(([id, unit]) => unit.name && unit.stars != null) // skip placeholder
-      .map(([id, unit]) => ({
-        id: id, // ambil dari key JSON
-        name: unit.name,
-        type: unit.type,
-        classes: unit.classes,
-        stars: unit.stars,
-        thumbnail: `api/images/thumbnail/jap/${idStr[0]}/${idStr[1]}00/${idStr}.png`
-      }));
+      .map(([id, unit]) => {
+        const idStr = String(id).padStart(4, "0");
+
+        // Tentukan folder pertama dan kedua sesuai pola
+        const folder1 = idStr[0];
+        const folder2Num = Math.floor(parseInt(idStr, 10) / 100) * 100;
+        const folder2 = String(folder2Num).padStart(3, "0");
+
+        const thumbnail = `/api/images/thumbnail/jap/${folder1}/${folder2}/${idStr}.png`;
+
+        return {
+          id: id,
+          name: unit.name,
+          type: unit.type,
+          classes: unit.classes,
+          stars: unit.stars,
+          thumbnail: thumbnail
+        };
+      });
 
   } catch (e) {
     console.error("Error loading characters:", e);
@@ -55,7 +67,7 @@ function openCharacterModal(unit, ownedSet) {
   title.textContent = unit.name;
   body.innerHTML = `
     <p>Type: ${unit.type}</p>
-    <p>Class: ${unit.class}</p>
+    <p>Class: ${unit.classes.join(", ")}</p>
     <p>Rarity: ${unit.stars}</p>
   `;
 
@@ -99,6 +111,3 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   renderCharacters(characters, ownedSet);
 });
-
-
-
