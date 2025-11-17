@@ -35,20 +35,24 @@ async function loadCharacters() {
 }
 
 // ==============================
-// Batch rendering
+// Pagination variables and functions
 // ==============================
 let characters = [];
 let ownedSet = new Set();
-let currentIndex = 0;
-const batchSize = 50;
+let currentPage = 1;
+const itemsPerPage = 50; // Tetap 50 per halaman
 
-function renderBatch() {
+function renderPage(page) {
   const grid = document.getElementById('grid');
   if (!Array.isArray(characters)) characters = [];
 
-  const slice = characters.slice(currentIndex, currentIndex + batchSize);
+  const start = (page - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const charactersToShow = characters.slice(start, end);
 
-  slice.forEach(unit => {
+  grid.innerHTML = ''; // Kosongkan grid sebelum render ulang
+
+  charactersToShow.forEach(unit => {
     const box = document.createElement('div');
     box.className = 'char-box';
     if (ownedSet.has(unit.id)) box.classList.add('owned');
@@ -63,13 +67,33 @@ function renderBatch() {
     grid.appendChild(box);
   });
 
-  currentIndex += batchSize;
+  updatePaginationButtons();
 }
 
-// Load next batch saat scroll ke bawah
-window.addEventListener('scroll', () => {
-  if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-    renderBatch();
+function updatePaginationButtons() {
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const pageInfo = document.getElementById('page-info');
+
+  const totalPages = Math.ceil(characters.length / itemsPerPage);
+  prevBtn.disabled = currentPage === 1;
+  nextBtn.disabled = currentPage === totalPages;
+  pageInfo.textContent = `Halaman ${currentPage} dari ${totalPages}`;
+}
+
+// Event listeners untuk tombol pagination
+document.getElementById('prev-btn').addEventListener('click', () => {
+  if (currentPage > 1) {
+    currentPage--;
+    renderPage(currentPage);
+  }
+});
+
+document.getElementById('next-btn').addEventListener('click', () => {
+  const totalPages = Math.ceil(characters.length / itemsPerPage);
+  if (currentPage < totalPages) {
+    currentPage++;
+    renderPage(currentPage);
   }
 });
 
@@ -128,6 +152,5 @@ function loadOwnedLocal() {
 window.addEventListener('DOMContentLoaded', async () => {
   characters = await loadCharacters();
   ownedSet = loadOwnedLocal();
-  renderBatch(); // batch pertama
+  renderPage(currentPage); // Render halaman pertama
 });
-
