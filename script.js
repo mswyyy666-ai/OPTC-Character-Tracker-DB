@@ -1,4 +1,3 @@
-// Load character data from GitHub
 async function loadCharacters() {
   const url = "https://raw.githubusercontent.com/mswyyy666-ai/OPTC-Character-Tracker-DB/main/data/characters.json";
 
@@ -8,15 +7,16 @@ async function loadCharacters() {
 
     const data = await response.json();
 
-    return Object.values(data).map((unit, index) => ({
-      id: unit.id ?? index,
-      name: unit.name,
-      type: unit.type,
-      class: unit.class,
-      stars: unit.stars,
-      thumbnail: `/api/images/thumbnail/jap/${unit.id ?? index}.png`,
-      onerror: "this.src='/api/images/thumbnail/jap/0/000/0001.png'"
-    }));
+    return Object.entries(data)
+      .filter(([id, unit]) => unit.name && unit.stars != null) // skip placeholder
+      .map(([id, unit]) => ({
+        id: id, // ambil dari key JSON
+        name: unit.name,
+        type: unit.type,
+        classes: unit.classes,
+        stars: unit.stars,
+        thumbnail: `/api/images/thumbnail/jap/${id}.png`
+      }));
 
   } catch (e) {
     console.error("Error loading characters:", e);
@@ -99,4 +99,5 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   renderCharacters(characters, ownedSet);
 });
+
 
