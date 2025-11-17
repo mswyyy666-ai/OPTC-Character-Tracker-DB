@@ -122,15 +122,16 @@ body{
 /* CHARACTER GRID */
 .grid{
   display:grid;
-  grid-template-columns: repeat(auto-fill, 64px);
-  gap:10px;
-  padding:8px;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Kolom otomatis, min 120px untuk menghindari overlap */
+  gap:15px; /* Jarak antar item */
+  padding:20px;
   align-content:start;
+  justify-items: center; /* Pusatkan thumbnail */
 }
 
-.card{
-  width:64px;
-  height:64px;
+.char-box{
+  width:100px; /* Ukuran tetap untuk konsistensi */
+  height:100px;
   border:2px solid rgba(255,255,255,0.06);
   border-radius:6px;
   background:linear-gradient(180deg,#101014, #15151b);
@@ -142,24 +143,49 @@ body{
   transition:filter .12s, transform .12s;
 }
 
-.card:hover{
+.char-box:hover{
   transform:translateY(-4px);
 }
 
-.card img{
-  width:56px;
-  height:56px;
+.char-box img{
+  width:90%; /* Sesuaikan agar tidak overflow */
+  height:90%;
   object-fit:cover;
   border-radius:4px;
 }
 
-.card.not-owned{
-  filter:grayscale(100%) brightness(.55);
-}
-
-.card.owned{
+.char-box.owned{
   box-shadow:0 0 10px rgba(98,208,255,0.08);
   filter:brightness(1.05);
+}
+
+/* PAGINATION */
+#pagination{
+  text-align:center;
+  margin:20px 0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+}
+
+#pagination button{
+  padding:10px 15px;
+  border-radius:4px;
+  cursor:pointer;
+  background:#111;
+  border:1px solid rgba(255,255,255,0.03);
+  color:var(--muted);
+}
+
+#pagination button:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
+}
+
+#page-info{
+  color:var(--muted);
+  font-size:14px;
 }
 
 /* MODAL */
@@ -197,169 +223,4 @@ body{
 .modal-header {
   min-height: 48px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-right: 40px;      /* ruang ekstra supaya bookmark dan X tidak tabrakan */
-}
-
-/* Tombol X di pojok kanan atas seperti UI modern */
-.close {
-  position: absolute;
-  top: 10px;                 /* lebih rapat, lebih rapi */
-  right: 10px;
-  background: transparent;
-  border: none;
-  color: var(--muted);
-  font-size: 20px;
-  cursor: pointer;
-  z-index: 20;               /* pastikan selalu di atas elemen lain */
-}
-
-/* Supaya body tidak naik terlalu dekat ke header */
-.modal-body {
-  margin-top: 16px;
-}
-
-/* FIXED close button */
-.close{
-  position:absolute;
-  right:18px;
-  top:18px;
-  background:transparent;
-  border:none;
-  color:var(--muted);
-  cursor:pointer;
-  font-size:22px;
-  padding:4px 8px;
-  transition:color .15s;
-}
-
-.close:hover{
-  color:var(--accent);
-}
-
-/* Modal Layout */
-.modal-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.modal-tools{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.modal-body{
-  margin-top:12px;
-  color:var(--muted);
-  display:grid;
-  grid-template-columns:150px 1fr;
-  gap:12px;
-}
-
-.modal-body img{
-  width:150px;
-  height:150px;
-  object-fit:cover;
-  border-radius:6px;
-  border:1px solid rgba(255,255,255,0.03);
-}
-
-.owned-toggle{
-  display:flex;
-  gap:8px;
-  align-items:center;
-  color:var(--muted);
-}
-
-.team-builder{ margin-top:8px }
-
-.team-list{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-
-.team-slot{
-  width:48px;
-  height:48px;
-  border:1px dashed rgba(255,255,255,0.04);
-  border-radius:6px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.muted{
-  color:var(--muted);
-  font-size:13px;
-}
-
-.collapse{ margin-top:8px }
-
-.bookmark-item{
-  padding:6px;
-  border-bottom:1px solid rgba(255,255,255,0.02);
-}
-
-/* Container untuk gambar karakter */
-.character-image {
-  width: 100%;             /* mengikuti lebar parent */
-  max-width: 200px;        /* kamu bebas atur: 150 / 200 / 250 */
-  aspect-ratio: 1 / 1;     /* thumbnail kotak, tetap proporsional */
-  margin: 0 auto;
-  display: flex;
-  border-radius: 8px;
-  overflow: hidden;        /* biar tidak melewati frame */
-  justify-content: center;
-  align-items: center;
-  background: #1b1b1b;     /* warna background kalau gambar kecil */
-}
-
-/* Gambar karakter */
-.character-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;     /* biar gambar tidak terdistorsi */
-  image-rendering: crisp-edges; 
-  image-rendering: pixelated; /* opsional kalau mau gaya pixel */
-}
-
-/* RESPONSIVE */
-@media (max-width:1000px){
-  .sidebar{ display:none }
-}
-
-/* Container untuk thumbnail */
-#character-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Kolom otomatis, min 120px per item */
-    gap: 15px; /* Jarak antar thumbnail */
-    padding: 20px;
-    justify-items: center; /* Pusatkan item */
-}
-/* Styling untuk setiap thumbnail */
-.thumbnail {
-    width: 100px; /* Ukuran tetap untuk menghindari overlap */
-    height: 100px;
-    object-fit: cover; /* Potong gambar agar pas tanpa distorsi */
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    transition: transform 0.2s; /* Efek hover */
-}
-.thumbnail:hover {
-    transform: scale(1.05); /* Sedikit zoom saat hover */
-}
-/* Responsivitas untuk mobile */
-@media (max-width: 600px) {
-    #character-grid {
-        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); /* Lebih kecil di mobile */
-    }
-    .thumbnail {
-        width: 80px;
-        height: 80px;
-    }
-}
-
+  justify-content: space-between
