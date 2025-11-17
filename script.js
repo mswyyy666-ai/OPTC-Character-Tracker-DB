@@ -1,5 +1,5 @@
-// Load character data from GitHub
-async function loadCharacters() {
+// Load only character ID 1
+async function loadCharacter1() {
   const url = "https://raw.githubusercontent.com/mswyyy666-ai/OPTC-Character-Tracker-DB/main/data/characters.json";
 
   try {
@@ -7,38 +7,33 @@ async function loadCharacters() {
     if (!response.ok) throw new Error("Failed to fetch character database");
 
     const data = await response.json();
+    const unit = data["1"]; // ambil hanya ID 1
 
-    return Object.entries(data)
-      .filter(([id, unit]) => unit.name && unit.stars != null) // skip placeholder
-      .map(([id, unit]) => {
-        const idStr = String(id).padStart(4, "0");
+    if (!unit || !unit.name || unit.stars == null) return [];
 
-        // Tentukan folder pertama dan kedua sesuai pola ribuan & ratusan
-        const folder1 = idStr[0];
-        const folder2Num = Math.floor(parseInt(idStr, 10) / 100) * 100;
-        const folder2 = String(folder2Num).padStart(3, "0");
+    const idStr = String(1).padStart(4, "0"); // "0001"
+    const folder1 = idStr[0]; // "0"
+    const folder2Num = Math.floor(parseInt(idStr, 10) / 100) * 100; // 0
+    const folder2 = String(folder2Num).padStart(3, "0"); // "000"
+    const thumbnail = `/api/images/thumbnail/glo/${folder1}/${folder2}/${idStr}.png`;
 
-        const thumbnail = `/api/images/thumbnail/jap/${folder1}/${folder2}/${idStr}.png`;
-
-        return {
-          id: id,
-          name: unit.name,
-          type: unit.type,
-          classes: unit.classes,
-          stars: unit.stars,
-          thumbnail: thumbnail
-        };
-      }) || []; // fallback array kosong
-
+    return [{
+      id: 1,
+      name: unit.name,
+      type: unit.type,
+      classes: unit.classes,
+      stars: unit.stars,
+      thumbnail: thumbnail
+    }];
   } catch (e) {
-    console.error("Error loading characters:", e);
-    return []; // fallback array kosong
+    console.error("Error loading character 1:", e);
+    return [];
   }
 }
 
-// Render characters to the grid
+// Render characters to the grid (same as before)
 function renderCharacters(list, ownedSet) {
-  if (!Array.isArray(list)) list = []; // extra safety
+  if (!Array.isArray(list)) list = [];
 
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
@@ -52,19 +47,26 @@ function renderCharacters(list, ownedSet) {
     img.src = unit.thumbnail;
     img.alt = unit.name;
 
-    // fallback image jika 404
-    img.onerror = () => {
-      img.src = '/api/images/common/icons/fallback.png';
-    };
+    // fallback jika error
+    img.onerror = () => img.src = '/api/images/common/icons/noimage.png';
 
     box.appendChild(img);
-
     box.addEventListener('click', () => openCharacterModal(unit, ownedSet));
     grid.appendChild(box);
   });
 }
 
-// Open modal
+// Owned characters
+function saveOwnedLocal(ownedSet) {
+  localStorage.setItem('ownedCharacters', JSON.stringify([...ownedSet]));
+}
+
+function loadOwnedLocal() {
+  const saved = localStorage.getItem('ownedCharacters');
+  return saved ? new Set(JSON.parse(saved)) : new Set();
+}
+
+// Modal sama seperti versi sebelumnya
 function openCharacterModal(unit, ownedSet) {
   const modal = document.getElementById('modal');
   const modalContent = document.getElementById("modal-content");
@@ -87,36 +89,18 @@ function openCharacterModal(unit, ownedSet) {
     saveOwnedLocal(ownedSet);
   };
 
-  // Click outside to close
   modal.onclick = (e) => {
-    if (!modalContent.contains(e.target)) {
-      modal.classList.add("hidden");
-    }
+    if (!modalContent.contains(e.target)) modal.classList.add("hidden");
   };
 
-  // Close button
-  modalCloseBtn.onclick = () => {
-    modal.classList.add("hidden");
-  };
+  modalCloseBtn.onclick = () => modal.classList.add("hidden");
 
   modal.classList.remove("hidden");
 }
 
-// Save locally
-function saveOwnedLocal(ownedSet) {
-  localStorage.setItem('ownedCharacters', JSON.stringify([...ownedSet]));
-}
-
-// Load locally
-function loadOwnedLocal() {
-  const saved = localStorage.getItem('ownedCharacters');
-  return saved ? new Set(JSON.parse(saved)) : new Set();
-}
-
 // Init
 window.addEventListener('DOMContentLoaded', async () => {
-  const characters = await loadCharacters();
+  const characters = await loadCharacter1();
   const ownedSet = loadOwnedLocal();
-
   renderCharacters(characters, ownedSet);
 });
