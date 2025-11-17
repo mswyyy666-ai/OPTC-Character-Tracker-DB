@@ -18,7 +18,7 @@ async function loadCharacter1() {
     const folder2Num = Math.floor(parseInt(idStr, 10) / 100) * 100; // 0
     const folder2 = String(folder2Num).padStart(3, "0"); // "000"
 
-    const thumbnail = `api/images/thumbnail/glo/${folder1}/${folder2}/${idStr}.png`;
+    const thumbnail = `api/images/thumbnail/jap/${folder1}/${folder2}/${idStr}.png`;
 
     return [{
       id: 1,
@@ -115,4 +115,5 @@ window.addEventListener('DOMContentLoaded', async () => {
   const ownedSet = loadOwnedLocal();
   renderCharacters(characters, ownedSet);
 });
+
 
