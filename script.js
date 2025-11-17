@@ -1,7 +1,7 @@
 // ==============================
-// Load only character ID 1
+// Load all characters
 // ==============================
-async function loadCharacter1() {
+async function loadCharacters() {
   const url = "https://raw.githubusercontent.com/mswyyy666-ai/OPTC-Character-Tracker-DB/main/data/characters.json";
 
   try {
@@ -9,41 +9,46 @@ async function loadCharacter1() {
     if (!response.ok) throw new Error("Failed to fetch character database");
 
     const data = await response.json();
-    const unit = data["1"]; // ambil hanya ID 1
 
-    if (!unit || !unit.name || unit.stars == null) return [];
+    return Object.entries(data)
+      .filter(([id, unit]) => unit && unit.name && unit.stars != null) // hanya karakter valid
+      .map(([id, unit]) => {
+        const idStr = String(id).padStart(4, "0");
+        const folder1 = idStr[0];
+        const folder2Num = Math.floor(parseInt(idStr, 10) / 100) * 100;
+        const folder2 = String(folder2Num).padStart(3, "0");
+        const thumbnail = `api/images/thumbnail/glo/${folder1}/${folder2}/${idStr}.png`;
 
-    const idStr = String(1).padStart(4, "0"); // "0001"
-    const folder1 = idStr[0]; // "0"
-    const folder2Num = Math.floor(parseInt(idStr, 10) / 100) * 100; // 0
-    const folder2 = String(folder2Num).padStart(3, "0"); // "000"
-
-    const thumbnail = `api/images/thumbnail/jap/${folder1}/${folder2}/${idStr}.png`;
-
-    return [{
-      id: 1,
-      name: unit.name,
-      type: unit.type,
-      classes: unit.classes,
-      stars: unit.stars,
-      thumbnail: thumbnail
-    }];
+        return {
+          id: parseInt(id, 10),
+          name: unit.name,
+          type: unit.type,
+          classes: unit.classes,
+          stars: unit.stars,
+          thumbnail: thumbnail
+        };
+      });
   } catch (e) {
-    console.error("Error loading character 1:", e);
+    console.error("Error loading characters:", e);
     return [];
   }
 }
 
 // ==============================
-// Render characters
+// Batch rendering
 // ==============================
-function renderCharacters(list, ownedSet) {
-  if (!Array.isArray(list)) list = [];
+let characters = [];
+let ownedSet = new Set();
+let currentIndex = 0;
+const batchSize = 50;
 
+function renderBatch() {
   const grid = document.getElementById('grid');
-  grid.innerHTML = '';
+  if (!Array.isArray(characters)) characters = [];
 
-  list.forEach(unit => {
+  const slice = characters.slice(currentIndex, currentIndex + batchSize);
+
+  slice.forEach(unit => {
     const box = document.createElement('div');
     box.className = 'char-box';
     if (ownedSet.has(unit.id)) box.classList.add('owned');
@@ -51,15 +56,22 @@ function renderCharacters(list, ownedSet) {
     const img = document.createElement('img');
     img.src = unit.thumbnail;
     img.alt = unit.name;
-
-    // fallback jika thumbnail gagal
     img.onerror = () => img.src = "api/images/common/noimage.png";
 
     box.appendChild(img);
     box.addEventListener('click', () => openCharacterModal(unit, ownedSet));
     grid.appendChild(box);
   });
+
+  currentIndex += batchSize;
 }
+
+// Load next batch saat scroll ke bawah
+window.addEventListener('scroll', () => {
+  if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+    renderBatch();
+  }
+});
 
 // ==============================
 // Modal
@@ -86,13 +98,16 @@ function openCharacterModal(unit, ownedSet) {
     saveOwnedLocal(ownedSet);
   };
 
-  modal.onclick = (e) => {
-    if (!modalContent.contains(e.target)) modal.classList.add("hidden");
-  };
+  // safe check sebelum contains
+  if (modal && modalContent) {
+    modal.onclick = (e) => {
+      if (!modalContent.contains(e.target)) modal.classList.add("hidden");
+    };
+  }
 
-  modalCloseBtn.onclick = () => modal.classList.add("hidden");
+  if (modalCloseBtn) modalCloseBtn.onclick = () => modal.classList.add("hidden");
 
-  modal.classList.remove("hidden");
+  if (modal) modal.classList.remove("hidden");
 }
 
 // ==============================
@@ -111,9 +126,7 @@ function loadOwnedLocal() {
 // Init
 // ==============================
 window.addEventListener('DOMContentLoaded', async () => {
-  const characters = await loadCharacter1();
-  const ownedSet = loadOwnedLocal();
-  renderCharacters(characters, ownedSet);
+  characters = await loadCharacters();
+  ownedSet = loadOwnedLocal();
+  renderBatch(); // batch pertama
 });
-
-
