@@ -53,7 +53,7 @@ function renderCharacters(list, ownedSet) {
     img.alt = unit.name;
 
     // fallback jika thumbnail gagal
-    img.onerror = () => img.src = "api/images/common/icons/noimage.png";
+    img.onerror = () => img.src = "api/images/common/noimage.png";
 
     box.appendChild(img);
     box.addEventListener('click', () => openCharacterModal(unit, ownedSet));
@@ -115,3 +115,4 @@ window.addEventListener('DOMContentLoaded', async () => {
   const ownedSet = loadOwnedLocal();
   renderCharacters(characters, ownedSet);
 });
+
