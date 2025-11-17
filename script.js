@@ -15,7 +15,7 @@ async function loadCharacters() {
         type: unit.type,
         classes: unit.classes,
         stars: unit.stars,
-        thumbnail: `/api/images/thumbnail/jap/${id}.png`
+        thumbnail: `api/images/thumbnail/jap/${idStr[0]}/${idStr[1]}00/${idStr}.png`
       }));
 
   } catch (e) {
@@ -99,5 +99,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   renderCharacters(characters, ownedSet);
 });
+
 
 
