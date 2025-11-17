@@ -332,4 +332,34 @@ body{
   .sidebar{ display:none }
 }
 
+/* Container untuk thumbnail */
+#character-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Kolom otomatis, min 120px per item */
+    gap: 15px; /* Jarak antar thumbnail */
+    padding: 20px;
+    justify-items: center; /* Pusatkan item */
+}
+/* Styling untuk setiap thumbnail */
+.thumbnail {
+    width: 100px; /* Ukuran tetap untuk menghindari overlap */
+    height: 100px;
+    object-fit: cover; /* Potong gambar agar pas tanpa distorsi */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: transform 0.2s; /* Efek hover */
+}
+.thumbnail:hover {
+    transform: scale(1.05); /* Sedikit zoom saat hover */
+}
+/* Responsivitas untuk mobile */
+@media (max-width: 600px) {
+    #character-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); /* Lebih kecil di mobile */
+    }
+    .thumbnail {
+        width: 80px;
+        height: 80px;
+    }
+}
 
