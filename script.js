@@ -8,32 +8,38 @@ async function loadCharacters() {
 
     const data = await response.json();
 
-Object.entries(data)
-  .filter(([id, unit]) => unit.name && unit.stars != null)
-  .map(([id, unit]) => {
-    const idStr = String(id).padStart(4, "0");
-    const folder1 = idStr[0];
-    const folder2Num = Math.floor(parseInt(idStr, 10) / 100) * 100;
-    const folder2 = String(folder2Num).padStart(3, "0");
+    return Object.entries(data)
+      .filter(([id, unit]) => unit.name && unit.stars != null) // skip placeholder
+      .map(([id, unit]) => {
+        const idStr = String(id).padStart(4, "0");
 
-    return {
-      id: id,
-      name: unit.name,
-      type: unit.type,
-      classes: unit.classes,
-      stars: unit.stars,
-      thumbnail: `/api/images/thumbnail/jap/${folder1}/${folder2}/${idStr}.png`
-    };
-  });
+        // Tentukan folder pertama dan kedua sesuai pola ribuan & ratusan
+        const folder1 = idStr[0];
+        const folder2Num = Math.floor(parseInt(idStr, 10) / 100) * 100;
+        const folder2 = String(folder2Num).padStart(3, "0");
+
+        const thumbnail = `/api/images/thumbnail/jap/${folder1}/${folder2}/${idStr}.png`;
+
+        return {
+          id: id,
+          name: unit.name,
+          type: unit.type,
+          classes: unit.classes,
+          stars: unit.stars,
+          thumbnail: thumbnail
+        };
+      }) || []; // fallback array kosong
 
   } catch (e) {
     console.error("Error loading characters:", e);
-    return [];
+    return []; // fallback array kosong
   }
 }
 
 // Render characters to the grid
 function renderCharacters(list, ownedSet) {
+  if (!Array.isArray(list)) list = []; // extra safety
+
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
 
@@ -42,9 +48,16 @@ function renderCharacters(list, ownedSet) {
     box.className = 'char-box';
     if (ownedSet.has(unit.id)) box.classList.add('owned');
 
-    box.innerHTML = `
-      <img src="${unit.thumbnail}" alt="${unit.name}" />
-    `;
+    const img = document.createElement('img');
+    img.src = unit.thumbnail;
+    img.alt = unit.name;
+
+    // fallback image jika 404
+    img.onerror = () => {
+      img.src = '/api/images/common/icons/fallback.png';
+    };
+
+    box.appendChild(img);
 
     box.addEventListener('click', () => openCharacterModal(unit, ownedSet));
     grid.appendChild(box);
@@ -107,4 +120,3 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   renderCharacters(characters, ownedSet);
 });
-
